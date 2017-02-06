@@ -781,6 +781,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Josh', $request->getParsedBody()->name);
     }
 
+    public function testSilentFailureWhenParsingInvalidXML()
+    {
+        $method = 'GET';
+        $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
+        $headers = new Headers();
+        $headers->set('Content-Type', 'application/xml;charset=utf8');
+        $cookies = [];
+        $serverParams = [];
+        $body = new RequestBody();
+        $body->write('<person><name>Josh</name>');
+        $request = new Request($method, $uri, $headers, $cookies, $serverParams, $body);
+
+        $this->assertNull($request->getParsedBody());
+    }
+
     public function testGetParsedBodyWithXmlStructuredSuffix()
     {
         $method = 'GET';
@@ -809,6 +824,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request($method, $uri, $headers, $cookies, $serverParams, $body);
 
         $this->assertEquals('Josh', $request->getParsedBody()->name);
+    }
+
+    public function testSilentFailureWhenParsingInvalidXMLText()
+    {
+        $method = 'GET';
+        $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
+        $headers = new Headers();
+        $headers->set('Content-Type', 'text/xml');
+        $cookies = [];
+        $serverParams = [];
+        $body = new RequestBody();
+        $body->write('<person><name>Josh</name>');
+        $request = new Request($method, $uri, $headers, $cookies, $serverParams, $body);
+
+        $this->assertNull($request->getParsedBody());
     }
 
     public function testGetParsedBodyWhenAlreadyParsed()
